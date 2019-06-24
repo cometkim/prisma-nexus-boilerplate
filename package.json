@@ -3,30 +3,37 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
+  "keywords": [
+    "prisma",
+    "graphql"
+  ],
+  "author": "",
+  "license": "ISC",
   "scripts": {
     "build": "tsc",
-    "start": "ts-node --transpileOnly src/index.ts",
-    "start:dev": "ts-node-dev --no-notify --respawn --transpileOnly src/index.ts",
+    "start": "ts-node -r tsconfig-paths/register --transpileOnly src/index.ts",
+    "start:dev": "ts-node-dev -r tsconfig-paths/register --no-notify --respawn --transpileOnly src/index.ts",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint --fix src/**/*.ts",
     "test": "jest"
   },
   "dependencies": {
-    "bcrypt": "3.0.6",
-    "graphql": "^14.3.0",
-    "graphql-shield": "5.3.5",
-    "graphql-yoga": "^1.17.4",
-    "jsonwebtoken": "8.5.1",
-    "nexus": "^0.11.7",
+    "bcrypt": "^3.0.6",
+    "graphql": "^14.3.1",
+    "graphql-shield": "^5.7.1",
+    "graphql-yoga": "^1.18.0",
+    "jsonwebtoken": "^8.5.1",
+    "nexus": "^0.12.0-beta.6",
     "nexus-prisma": "^0.3.7",
-    "prisma-client-lib": "1.33.0"
+    "prisma-binding": "^2.3.15",
+    "prisma-client-lib": "^1.34.0"
   },
   "devDependencies": {
-    "@types/bcrypt": "3.0.0",
-    "@types/graphql": "14.2.0",
+    "@types/bcrypt": "^3.0.0",
+    "@types/graphql": "^14.2.1",
     "@types/jest": "^24.0.13",
-    "@types/jsonwebtoken": "8.3.2",
-    "@types/node": "12.0.2",
+    "@types/jsonwebtoken": "^8.3.2",
+    "@types/node": "^12.0.10",
     "@typescript-eslint/parser": "^1.9.0",
     "eslint": "^5.16.0",
     "eslint-config-standard": "^12.0.0",
@@ -35,13 +42,11 @@
     "eslint-plugin-promise": "^4.1.1",
     "eslint-plugin-standard": "^4.0.0",
     "jest": "^24.8.0",
-    "prisma-binding": "^2.3.10",
+    "nexus-prisma-generate": "^0.3.7",
     "ts-jest": "^24.0.2",
-    "ts-node": "8.2.0",
-    "ts-node-dev": "^1.0.0-pre.39",
-    "typescript": "^3.4.5"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+    "ts-node": "^8.3.0",
+    "ts-node-dev": "^1.0.0-pre.40",
+    "tsconfig-paths": "^3.8.0",
+    "typescript": "^3.5.2"
+  }
 }

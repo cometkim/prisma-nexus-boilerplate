@@ -1,6 +1,15 @@
 version: '3.5'
 
 services:
+  db:
+    image: postgres:11
+    restart: on-failure
+    environment:
+      POSTGRES_USER: ${DB_USER:-prisma}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-prisma}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
   prisma:
     build: prisma
     restart: on-failure
@@ -18,17 +27,6 @@ services:
             port: ${DB_PORT:-5432}
             user: ${DB_USER:-prisma}
             password: ${DB_PASSWORD:-prisma}
-            rawAccess: true
-            migrations: true
-
-  db:
-    image: postgres:11
-    restart: on-failure
-    environment:
-      POSTGRES_USER: ${DB_USER:-prisma}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-prisma}
-    volumes:
-      - postgres:/var/lib/postgresql/data
 
 volumes:
   postgres:

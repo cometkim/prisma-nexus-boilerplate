@@ -1,8 +1,12 @@
 type User {
   id: ID! @id
+  password: String! @db(name: "passwordDigest")
   email: String! @unique
-  name: String
-  posts: [Post!]!
+  username: String! @unique
+  nickname: String
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  posts: [Post!]! @relation(link: TABLE)
 }
 
 type Post {

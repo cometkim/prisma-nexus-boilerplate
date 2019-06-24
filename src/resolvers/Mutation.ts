@@ -1,9 +1,6 @@
-import { prismaObjectType, makePrismaSchema } from 'nexus-prisma';
-import { idArg } from 'nexus';
+import { prismaObjectType } from 'nexus-prisma';
 
-const Mutation = prismaObjectType({
+export const Mutation = prismaObjectType({
   name: 'Mutation',
   definition: (t) => t.prismaFields(['*']),
 });
-
-export default Mutation;
