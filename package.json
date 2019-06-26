@@ -17,8 +17,12 @@
     "lint:fix": "eslint --fix src/**/*.ts",
     "test": "jest"
   },
+  "resolutions": {
+    "graphql": "14.3.1"
+  },
   "dependencies": {
     "bcrypt": "^3.0.6",
+    "dotenv": "^8.0.0",
     "graphql": "^14.3.1",
     "graphql-shield": "^5.7.1",
     "graphql-yoga": "^1.18.0",
@@ -35,12 +39,15 @@
     "@types/jsonwebtoken": "^8.3.2",
     "@types/node": "^12.0.10",
     "@typescript-eslint/parser": "^1.9.0",
+    "apollo-server": "^2.6.7",
+    "apollo-server-testing": "^2.6.7",
     "eslint": "^5.16.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.17.2",
     "eslint-plugin-node": "^9.1.0",
     "eslint-plugin-promise": "^4.1.1",
     "eslint-plugin-standard": "^4.0.0",
+    "graphql-tag": "^2.10.1",
     "jest": "^24.8.0",
     "nexus-prisma-generate": "^0.3.7",
     "ts-jest": "^24.0.2",

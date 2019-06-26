@@ -3,7 +3,6 @@
     "target": "es6",
     "lib": ["es2016", "esnext"],
     "outDir": "build",
-    "skipLibCheck": true,
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -11,9 +10,9 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "noEmit": true,
-    "baseUrl": "src"
-  },
-  "include": [
-    "src/**/*"
-  ]
+    "baseUrl": "./",
+    "paths": {
+      "~/*": ["*"]
+    }
+  }
 }

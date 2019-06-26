@@ -1,17 +1,19 @@
 import { idArg } from 'nexus';
 import { prismaObjectType } from 'nexus-prisma';
 
-import { getUserId } from 'utils';
-import { User } from './User';
+import { getUserId } from '~/src/utils';
+import { User, Post } from '~/src/resolvers';
 
+// @ts-ignore
 export const Query = prismaObjectType({
   name: 'Query',
   definition(t) {
     t.field('me', {
       type: User,
-      resolve(parent, args, ctx) {
+      async resolve(parent, args, ctx) {
         const userId = getUserId(ctx);
-        return ctx.prisma.user({ id: userId });
+        const [user] = await ctx.prisma.users({ where: { id: userId }});
+        return user;
       },
     });
 
@@ -20,8 +22,9 @@ export const Query = prismaObjectType({
       args: {
         id: idArg({ required: true }),
       },
-      resolve(parent, { id }, ctx) {
-        return ctx.prisma.user({ id });
+      async resolve(parent, { id }, ctx) {
+        const [user] = await ctx.prisma.users({ where: { id }});
+        return user;
       },
     });
 
@@ -32,14 +35,22 @@ export const Query = prismaObjectType({
         return ctx.prisma.users({
           where: {
             NOT: { id: userId },
-          }
+          },
         });
       },
     });
 
-    t.prismaFields([
-      'post',
-      'posts',
-    ]);
+    t.field('post', {
+      type: Post,
+      args: {
+        id: idArg({ required: true }),
+      },
+      async resolve(parent, { id }, ctx) {
+        const [post] = await ctx.prisma.posts({ where: { id }});
+        return post;
+      },
+    });
+
+    t.prismaFields(['posts']);
   },
 });
