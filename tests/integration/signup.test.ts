@@ -1,61 +1,62 @@
 import gql from 'graphql-tag';
+import { verify } from 'jsonwebtoken';
 
-//@ts-ignore
-import { createTestEnv, MockedPrismaClient } from '~/tests/helpers';
+import * as PrismaClient from '~/src/generated/prisma-client'
 
-const SIGNUP_MUTAION = gql`
-  mutation signup($email: String!, $username: String!, $password: String!) {
-    signup(email: $email, username: $username, password: $password) {
-      token
-      user {
-        id
-      }
-    }
-  }
-`
-// beforeEach(() => {
-  jest.mock('~/src/generated/prisma-client', () => {
-    const actual = require.requireActual('~/src/generated/prisma-client');
-    console.log(actual);
-    function mockEntry(entry: any): any {
-      if (entry instanceof Function) {
-        return jest.fn()
-      } else if (entry instanceof Array) {
-        return entry.map(e => mockEntry(e))
-      } else if (entry && typeof entry === 'object') {
-        return Object.fromEntries(
-          Object.entries(entry)
-            .map(([key, val]) => [key, mockEntry(val)])
-        )
-      } else {
-        return entry
-      }
-    }
-    return {
-      prisma: mockEntry(actual.prisma),
-    };
-  });
-// })
+import {
+  createTestEnv,
+  deeplyMockInterface,
+  DeeplyMocked,
+} from '~/tests/helpers';
+import { getAppSecret } from '~/src/utils';
 
-afterEach(() => {
-  jest.unmock('~/src/generated/prisma-client');
-})
+// FIXME: Should have automatically inferred return type
+const { prisma: _prisma } = deeplyMockInterface<typeof PrismaClient>('~/src/generated/prisma-client', (orignal, mocked) => ({
+  ...orignal,
+  prisma: mocked.prisma,
+}));
+const prisma = _prisma as DeeplyMocked<typeof PrismaClient['prisma']>
 
 it('Signup', async () => {
-  const { client, prisma } = createTestEnv();
+  const SIGNUP_MUTATION = gql`
+    mutation signup($email: String!, $username: String!, $password: String!) {
+      signup(email: $email, username: $username, password: $password) {
+        token
+        user {
+          id
+          email
+          username
+          nickname
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  `;
 
-  const prismaMock = prisma as MockedPrismaClient;
-  prismaMock.createUser.mockImplementationOnce((_: any, args: any) => {
-    return { ...args };
-  })
+  const { client } = createTestEnv();
 
-  const res = await client.mutate({
-    mutation: SIGNUP_MUTAION,
+  prisma.createUser.mockImplementationOnce((args) => {
+    const testUser = {
+      id: 'TEST_ID',
+      nickname: null,
+      createdAt: new Date('2019-06-27T16:43:55.475Z'),
+      updatedAt: new Date('2019-06-27T16:43:55.475Z'),
+      ...args,
+    }
+    return Promise.resolve(testUser);
+  });
+
+  const { data } = await client.mutate({
+    mutation: SIGNUP_MUTATION,
     variables: {
-      email: 'test@example.com',
-      username: 'TEST_USERNAME',
+      username: 'TEST',
+      email: 'TEST@example.com',
       password: 'TEST_PASSWORD',
     },
   });
-  console.log(res);
+
+  expect(data!.signup).toBeDefined();
+  expect(data!.signup.user).toMatchSnapshot();
+  expect(verify(data!.signup.token, getAppSecret())).toMatchObject({ userId: 'TEST_ID' });
 });

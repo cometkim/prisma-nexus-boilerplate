@@ -6,7 +6,6 @@ import datamodelInfo from './generated/nexus-prisma';
 
 import * as allTypes from './resolvers'
 
-console.log(prisma)
 export default makePrismaSchema({
   types: allTypes,
 

@@ -1,26 +1,48 @@
 import { ApolloServer } from 'apollo-server';
 import { createTestClient } from 'apollo-server-testing';
+import cloneDeepWith from 'lodash/cloneDeepWith';
+import isFunction from 'lodash/isFunction';
 
-import { prisma } from '~/src/generated/prisma-client';
-import schema from '~/src/schema';
+export type DeeplyMocked<T> = T extends (...args: any[]) => any
+  ? jest.Mock
+  : T extends object
+  ? DeeplyMockedObject<T>
+  : T
+  ;
 
-export type MockEntry<T> = T extends (...args: any[]) => any
-    ? jest.Mock
-    : T extends any[]
-    ? MockEntryArray<T[number]>
-    : T extends object
-    ? MockEntryObject<T>
-    : T
-
-export interface MockEntryArray<T> extends Array<MockEntry<T>> {}
-export type MockEntryObject<T> = {
-    [P in keyof T]: MockEntry<T[P]>
+export type DeeplyMockedObject<T> = {
+  [P in keyof T]: DeeplyMocked<T[P]>;
 };
 
-export type MockedPrismaClient = MockEntry<typeof prisma>;
+type DeeplyMockInterfaceCustomizer<T> = (original: T, mocked: DeeplyMocked<T>) => any;
+export function deeplyMockInterface<T>(modulePath: string, cb?: DeeplyMockInterfaceCustomizer<T>) {
+  function mock(value: any) {
+    if (isFunction(value)) {
+      return jest.fn();
+    }
+  }
+  const original = require.requireActual(modulePath) as T;
+  const mocked = cloneDeepWith(original, mock) as DeeplyMocked<T>;
+  if (cb) {
+    const customized = cb(original, mocked);
+    jest.mock(modulePath, () => customized);
+    return customized;
+  } else {
+    jest.mock(modulePath, () => mocked);
+    return mocked;
+  }
+}
 
 export function createTestEnv() {
-    const server = new ApolloServer({ schema });
-    const client = createTestClient(server);
-    return { server, client, prisma };
+  const { default: schema } = require('~/src/schema');
+  const { prisma } = require('~/src/generated/prisma-client');
+  const server = new ApolloServer({
+    schema,
+    context: req => ({
+      ...req,
+      prisma,
+    }),
+  });
+  const client = createTestClient(server);
+  return { server, client };
 }
