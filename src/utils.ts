@@ -20,7 +20,7 @@ export function signToken(userId: string): string {
 }
 
 export function getUserId(context: Context) {
-  const Authorization = context.request.get('Authorization')
+  const Authorization = context.request.get('authorization')
   if (Authorization) {
     const token = Authorization.replace('Bearer ', '')
     const verifiedToken = verify(token, getAppSecret()) as Token
