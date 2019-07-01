@@ -9,6 +9,7 @@ import {
   DeeplyMocked,
 } from '~/tests/helpers';
 import { getAppSecret } from '~/src/utils';
+import { NexusGenRootTypes, NexusGenFieldTypes } from '~/src/generated/nexus';
 
 // FIXME: Should have automatically inferred return type
 const { prisma: _prisma } = deeplyMockInterface<typeof PrismaClient>('~/src/generated/prisma-client', (orignal, mocked) => ({
@@ -47,7 +48,7 @@ it('Signup', async () => {
     return Promise.resolve(testUser);
   });
 
-  const { data } = await client.mutate({
+  const result = await client.mutate({
     mutation: SIGNUP_MUTATION,
     variables: {
       username: 'TEST',
@@ -55,8 +56,9 @@ it('Signup', async () => {
       password: 'TEST_PASSWORD',
     },
   });
+  const data = result.data as NexusGenFieldTypes['Mutation'];
 
-  expect(data!.signup).toBeDefined();
-  expect(data!.signup.user).toMatchSnapshot();
-  expect(verify(data!.signup.token, getAppSecret())).toMatchObject({ userId: 'TEST_ID' });
+  expect(data.signup).toBeDefined();
+  expect(data.signup.user).toMatchSnapshot();
+  expect(verify(data.signup.token, getAppSecret())).toMatchObject({ userId: 'TEST_ID' });
 });
