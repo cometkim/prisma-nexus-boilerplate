@@ -63,8 +63,8 @@ it('Signup', async () => {
     email: 'TEST@example.com',
     username: 'TEST',
     nickname: null,
-    createdAt: new Date('2019-06-27T16:43:55.475Z'),
-    updatedAt: new Date('2019-06-27T16:43:55.475Z'),
+    createdAt: '2019-06-27T16:43:55.475Z',
+    updatedAt: '2019-06-27T16:43:55.475Z',
   });
 
   const decodedJWT = verify(data.signup.token, getAppSecret());
