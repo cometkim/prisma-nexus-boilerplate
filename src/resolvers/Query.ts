@@ -5,6 +5,7 @@ import { getUserId } from '~/src/utils';
 import { User, Post } from '~/src/resolvers';
 
 // @ts-ignore
+// FIXME: see https://github.com/prisma/nexus-prisma/issues/291
 export const Query = prismaObjectType({
   name: 'Query',
   definition(t) {

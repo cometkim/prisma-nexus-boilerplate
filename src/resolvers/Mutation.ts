@@ -13,6 +13,8 @@ const AuthPayload = objectType({
   },
 });
 
+// @ts-ignore
+// FIXME: see https://github.com/prisma/nexus-prisma/issues/291
 export const Mutation = prismaObjectType({
   name: 'Mutation',
   definition(t) {

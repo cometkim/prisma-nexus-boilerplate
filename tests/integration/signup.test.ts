@@ -7,9 +7,9 @@ import {
   createTestEnv,
   deeplyMockInterface,
   DeeplyMocked,
+  MutationResult,
 } from '~/tests/helpers';
 import { getAppSecret } from '~/src/utils';
-import { NexusGenRootTypes, NexusGenFieldTypes } from '~/src/generated/nexus';
 
 // FIXME: Should have automatically inferred return type
 const { prisma: _prisma } = deeplyMockInterface<typeof PrismaClient>('~/src/generated/prisma-client', (orignal, mocked) => ({
@@ -39,26 +39,34 @@ it('Signup', async () => {
 
   prisma.createUser.mockImplementationOnce((args) => {
     const testUser = {
-      id: 'TEST_ID',
-      nickname: null,
-      createdAt: new Date('2019-06-27T16:43:55.475Z'),
-      updatedAt: new Date('2019-06-27T16:43:55.475Z'),
       ...args,
-    }
+      id: 'TEST_ID',
+      nickname: undefined,
+      createdAt: '2019-06-27T16:43:55.475Z',
+      updatedAt: '2019-06-27T16:43:55.475Z',
+    };
     return Promise.resolve(testUser);
   });
 
-  const result = await client.mutate({
+  const { data } = await client.mutate({
     mutation: SIGNUP_MUTATION,
     variables: {
       username: 'TEST',
       email: 'TEST@example.com',
       password: 'TEST_PASSWORD',
     },
-  });
-  const data = result.data as NexusGenFieldTypes['Mutation'];
+  }) as MutationResult<'signup'>;
 
   expect(data.signup).toBeDefined();
-  expect(data.signup.user).toMatchSnapshot();
-  expect(verify(data.signup.token, getAppSecret())).toMatchObject({ userId: 'TEST_ID' });
+  expect(data.signup.user).toMatchObject({
+    id: 'TEST_ID',
+    email: 'TEST@example.com',
+    username: 'TEST',
+    nickname: null,
+    createdAt: new Date('2019-06-27T16:43:55.475Z'),
+    updatedAt: new Date('2019-06-27T16:43:55.475Z'),
+  });
+
+  const decodedJWT = verify(data.signup.token, getAppSecret());
+  expect(decodedJWT).toMatchObject({ userId: 'TEST_ID' });
 });
