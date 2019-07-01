@@ -4,6 +4,7 @@ import cloneDeepWith from 'lodash/cloneDeepWith';
 import isFunction from 'lodash/isFunction';
 
 import { NexusGenFieldTypes } from '~/src/generated/nexus';
+import { Fragmentable } from '~/src/generated/prisma-client';
 
 export type MutationResult<T = any> = T extends keyof NexusGenFieldTypes['Mutation']
   ? { data: Record<T, NexusGenFieldTypes['Mutation'][T]> }
@@ -22,9 +23,11 @@ export type DeeplyMocked<T> = T extends (...args: infer U) => infer R
   : T
   ;
 
-export type NoFragmentLike<T> = T extends Promise<infer U>
+export type NoFragmentLike<T> = T extends Fragmentable
+  ? T extends Promise<infer U>
   ? Promise<U>
   : never
+  : T
 
 export type DeeplyMockedObject<T> = {
   [P in keyof T]: DeeplyMocked<T[P]>;
